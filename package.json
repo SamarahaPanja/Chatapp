@@ -1,38 +1,62 @@
 {
   "name": "chatapp",
-  "version": "0.1.0",
-  "private": true,
+  "version": "1.0.0",
+  "description": "A real time chat application built using the MERN stack",
+  "main": "index.js",
   "dependencies": {
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-scripts": "^3.0.1",
-    "web-vitals": "^2.1.4"
+    "accepts": "^1.3.8",
+    "anymatch": "^3.1.3",
+    "balanced-match": "^1.0.2",
+    "base64id": "^2.0.0",
+    "binary-extensions": "^2.3.0",
+    "brace-expansion": "^1.1.11",
+    "braces": "^3.0.3",
+    "chokidar": "^3.6.0",
+    "concat-map": "^0.0.1",
+    "cookie": "^0.7.2",
+    "cors": "^2.8.5",
+    "debug": "^4.3.7",
+    "engine.io": "^6.6.2",
+    "engine.io-parser": "^5.2.3",
+    "express": "^4.21.2",
+    "fill-range": "^7.1.1",
+    "glob-parent": "^5.1.2",
+    "has-flag": "^3.0.0",
+    "ignore-by-default": "^1.0.1",
+    "is-binary-path": "^2.1.0",
+    "is-extglob": "^2.1.1",
+    "is-glob": "^4.0.3",
+    "is-number": "^7.0.0",
+    "mime-db": "^1.52.0",
+    "mime-types": "^2.1.35",
+    "minimatch": "^3.1.2",
+    "ms": "^2.1.3",
+    "negotiator": "^0.6.3",
+    "normalize-path": "^3.0.0",
+    "object-assign": "^4.1.1",
+    "picomatch": "^2.3.1",
+    "pstree.remy": "^1.1.8",
+    "readdirp": "^3.6.0",
+    "semver": "^7.6.3",
+    "simple-update-notifier": "^2.0.0",
+    "socket.io": "^4.8.1",
+    "socket.io-adapter": "^2.5.5",
+    "socket.io-parser": "^4.2.4",
+    "supports-color": "^5.5.0",
+    "to-regex-range": "^5.0.1",
+    "touch": "^3.1.1",
+    "undefsafe": "^2.0.5",
+    "undici-types": "^6.20.0",
+    "vary": "^1.1.2",
+    "ws": "^8.17.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
   },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^3.1.9"
   }
 }
