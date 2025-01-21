@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat App</title>
+    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer src="script.js"></script>
+    <script>
+        const roomName = "<%= roomName %>"  //defining roomName for room emitted by io
+    </script>
+    <script defer type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/downloadjs/1.4.1/download.min.js"></script>
+
+</head>
+<body>
+    <h1>Chatting</h1>   
+    <!-- <button onclick="createConnection()">JOIN</button> -->
+
+    <input type="text" id="message" placeholder="Enter Message">
+    <button id="sendBtn">SEND</button>
+    <h4>Send File</h4>
+    <input type="file" id="fileInput">
+    <button id="uploadBtn">SEND File</button>
+    <p id="fileStatus"></p>
+
+
+    <div id="messages"></div>
+    
+
+    
+    <script>
+    
+    </script>
+</body>
+</html>
