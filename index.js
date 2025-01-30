@@ -9,10 +9,20 @@ const path = require('path')
 const { Server } = require('socket.io')
 const io = new Server(server)
 
+
+
 app.set("view engine", "ejs")
 app.set("views", path.resolve("./views"))
 app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
+
+
+require('dotenv').config()
+const mongoose = require('mongoose')
+
+mongoose.connect('mongodb://localhost:27017/dynamic-chatapp')
+//mongodb://localhost:27017/dynamic-chatapp
+
 
 
 
@@ -78,11 +88,14 @@ server.listen(9000, () => console.log('Server started at port 9000'))
 //app.use(express.static(path.resolve("./public")));
 
 
-app.get('/', (req, res) => {
-    //return res.sendFile('/public/index.html')
+const userRoute = require('./routes/userRoute');
+app.use('/', userRoute)
 
-    return res.render('index', { rooms: rooms })
-})
+// app.get('/', (req, res) => {
+//     //return res.sendFile('/public/index.html')
+
+//     return res.render('index', { rooms: rooms })
+// })
 
 app.post('/room', (req, res) => {
     if (rooms[req.params.room] != null) {  //case when room already exsists
@@ -95,10 +108,55 @@ app.post('/room', (req, res) => {
     
 })
 
-app.get('/:room', (req, res) => {
-    if (rooms[req.params.room] == null) {
-        return res.redirect('/')  //someone tries to access non exsisting room
-    }
-    res.render('room', { roomName: req.params.room })
-})
+// app.get('/:room', (req, res) => {
+//     if (rooms[req.params.room] == null) {
+//         return res.redirect('/')  //someone tries to access non exsisting room
+//     }
+//     res.render('room', { roomName: req.params.room })
+// })
 
+app.get('/video/:room', (req, res) => {
+    res.render('video',{roomId: req.params.room});
+});
+
+
+const User = require('./models/userModel')
+const Chat = require('./models/chatModel')
+
+var usp = io.of('/user-namespace')
+usp.on('connection', async (socket)=>{
+    console.log('a user connected', socket.id)
+    //console.log(socket.handshake.auth.token)
+    var userId = socket.handshake.auth.token;
+    await User.findByIdAndUpdate({_id: userId},{$set:{is_online: '1'}})
+
+
+    //user broadcast online status
+    socket.broadcast.emit('getOnlineUser',{user_id: userId})
+
+    socket.on('disconnect', async () => {
+        console.log('user disconnected',socket.id)
+        userId = socket.handshake.auth.token;
+        await User.findByIdAndUpdate({_id: userId},{$set:{is_online: '0'}})
+
+        //user broadcast offline status
+        socket.broadcast.emit('getOfflineUser',{user_id: userId})
+    })
+
+    //chatting implementation
+    socket.on('newChat',(data)=>{
+        socket.broadcast.emit('loadNewChat',data)
+    })
+
+    //load old chats
+    socket.on('exsistsChat',async (data)=>{
+        console.log("asked to load chats")
+        const chats = await Chat.find({ $or:[
+            {sender_id: data.sender_id,receiver_id: data.receiver_id},
+            {sender_id: data.receiver_id,receiver_id: data.sender_id},
+        ]})
+        console.log("chats",chats)
+        socket.emit('loadChats',{chats:chats})
+    })
+    
+})

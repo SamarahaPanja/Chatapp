@@ -1,0 +1,195 @@
+<%-include('layouts/header.ejs') %>
+
+    <h2 class="mb-4">Hello <%= user.name %>
+    </h2>
+
+    <div class="row">
+        <div class="col-md-4">
+            <ul class="list-group">
+                <% if(users.length> 0) {
+                    for(let i=0; i<users.length; i++) { %>
+
+                        <li class="list-group-item list-group-item-dark cursor-pointer user-list"
+                            data-id='<%= users[i]['_id']%>'>
+                            <img src="<%='http://localhost:9000/'+users[i]['image'] %>" alt="" height="50px"
+                                width="50px">
+                            <%= users[i]['name'] %>
+
+                                <% if(users[i]['is_online']==1){ %>
+                                    <sup class="online-status" id="<%= users[i]['_id']%>-status">Online</sup>
+                                    <% } else{ %>
+                                        <sup class="offline-status" id="<%= users[i]['_id']%>-status">Offline</sup>
+                                        <% } %>
+
+                        </li>
+                        <% } } %>
+            </ul>
+        </div>
+
+        <div class="col-md-8">
+            <h3 class="start-head">Click to start Chat</h3>
+            <div class="chat-section">
+                <div id="chat-container">
+                    
+                </div>
+
+                <form action="" id="chat-form">
+                    <input type="text" id="message" class="one border" placeholder="Enter Message"  required>
+                    <input type="submit" value="Send" id="sendBtn" class="btn btn-primary">
+                    <button class="first-btn btn">😀</button>
+                </form>
+                
+            </div>
+            
+        </div>
+        
+    </div>
+
+    <script>
+
+        var sender_id = '<%= user._id %>'
+        var receiver_id;
+        var socket = io('/user-namespace', {
+            auth: {
+                token: '<%= user._id %>'       //helps map between socket and user on database
+            }
+        })
+
+
+        $(document).ready(function () {
+
+            $('.user-list').click(function () {
+
+                var user_id = $(this).attr('data-id');
+                receiver_id = user_id;
+
+                $('.start-head').hide(); // Hide the start heading
+                $('.chat-section').show(); // Show the chat section
+                
+                socket.emit('exsistsChat',{sender_id: sender_id, receiver_id: receiver_id})
+            });
+        });
+
+        // update user online status
+        socket.on('getOnlineUser', (data) => {
+            $('#' + data.user_id + '-status').text('Online');
+            $('#' + data.user_id + '-status').removeClass('offline-status');
+            $('#' + data.user_id + '-status').addClass('online-status');
+        })
+
+        // update user offline status
+        socket.on('getOfflineUser', (data) => {
+            $('#' + data.user_id + '-status').text('Offline');
+            $('#' + data.user_id + '-status').removeClass('online-status');
+            $('#' + data.user_id + '-status').addClass('offline-status');
+        })
+
+        //chat save of user
+        $('#chat-form').submit((e) => {
+            e.preventDefault();
+            var message = $('#message').val();
+
+            jQuery.noConflict();
+            $.ajax({
+                url: '/save-chat',
+                type: 'post',
+                data: {
+                    sender_id: sender_id,
+                    receiver_id: receiver_id,
+                    message: message
+                },
+                success: (response) => {
+                    if (response.success) {
+                        $('#message').val('');
+                        let chat = response.data.message;
+                        let html = `
+                            <div class="current-user-chat">
+                                <h5>`+chat+`</h5> 
+                            </div>
+                        `;
+                        $('#chat-container').append(html);
+                        socket.emit('newChat', response.data);
+                        scrollChat();
+                    }
+                    else {
+                        alert(data.msg)
+                    }
+                }
+            });
+        })
+
+        socket.on('loadNewChat',(data)=>{
+            if(sender_id == data.receiver_id && receiver_id == data.sender_id) {
+                let chat = data.message;
+                let html = `
+                    <div class="distance-user-chat">
+                        <h5>`+chat+`</h5>
+                    </div>
+                `;
+                $('#chat-container').append(html);
+                scrollChat();
+            }
+        })
+
+        //load chats 
+        socket.on('loadChats',(data)=>{
+            $('#chat-container').html('');
+            const chats = data.chats
+            //console.log(chats);
+            let html = '';
+            for(let x=0;x<chats.length;x++) {
+                let addClass = '';
+                if(chats[x]['sender_id']==sender_id){
+                    addClass = 'current-user-chat';
+                }
+                else{
+                    addClass = 'distance-user-chat';
+                }
+                html+=`
+                    <div class='`+addClass+`''>
+                        <h5>`+chats[x]['message']+`</h5>
+                    </div>
+                `;
+
+            }
+            $('#chat-container').append(html);
+            scrollChat();
+        })
+
+        function scrollChat() {
+            jQuery.noConflict();
+            let chatContainer = $('#chat-container');
+            chatContainer.animate({
+                scrollTop: chatContainer[0].scrollHeight
+            }, 'fast'); // Use 'fast' or adjust duration for smooth scrolling
+        }
+
+
+        
+
+    </script>
+
+    <script src="/vanillaEmojiPicker.js"></script>
+    <script>
+
+        new EmojiPicker({
+            trigger: [
+                {
+                    selector: '.first-btn',
+                    insertInto: ['.one', '.two'] // '.selector' can be used without array
+                },
+                {
+                    selector: '.second-btn',
+                    insertInto: '.two'
+                }
+            ],
+            closeButton: true,
+            //specialButtons: green
+        });
+
+    </script>
+    
+
+
+
+    <%-include('layouts/footer.ejs') %>

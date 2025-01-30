@@ -14,6 +14,8 @@ const fileInput = document.getElementById('fileInput');
 const uploadBtn = document.getElementById('uploadBtn');
 const fileStatus = document.getElementById('fileStatus');
 
+const videoCallBtn = document.getElementById('videoCall');
+
 if (msgInput != null) {
     const name = prompt("What is your name?");
     const p = document.createElement("p");
@@ -61,6 +63,11 @@ if (msgInput != null) {
 
         };
         reader.readAsArrayBuffer(file);
+    });
+
+    videoCallBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        window.location.href = `/video/${roomName}`;
     });
 }
 
