@@ -44,6 +44,8 @@ user_route.get('/dashboard',auth.isLogin,userController.loadDashboard)
 
 user_route.post('/save-chat',userController.saveChat);
 
+user_route.post('/delete-chat',userController.deleteChat);
+
 
 user_route.get('/register',auth.isLogout,userController.registerLoad)
 user_route.post('/register',upload.single('image'),userController.register)

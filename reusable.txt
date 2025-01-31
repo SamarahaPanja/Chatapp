@@ -1,0 +1,32 @@
+//load chats 
+        socket.on('loadChatsWrongOne',(data)=>{
+            $('#chat-container').html('');
+            const chats = data.chats
+            //console.log(chats);
+            let html = '';
+            for(let x=0;x<chats.length;x++) {
+                let addClass = '';
+                if(chats[x]['sender_id']==sender_id){
+                    addClass = 'current-user-chat';
+                }
+                else{
+                    addClass = 'distance-user-chat';
+                }
+                html+=`
+                    <div class='`+addClass+`' id='`+chat[x]['_id']+`'>
+                        <h5>`+chats[x]['message']+``;
+                if(chats[x]['sender_id']==sender_id){
+                    html+=`<i class="fa fa-trash" aria-hidden="true" data-id='`+chat[x]['_id']+`' data-toggle="modal" data-target="#deleteChatModal"></i>`
+                }
+                html+=`</h5> 
+                    </div>
+                `;
+
+            }
+            $('#chat-container').append(html);
+            scrollChat();
+        })
+
+
+
+        

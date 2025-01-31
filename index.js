@@ -158,5 +158,10 @@ usp.on('connection', async (socket)=>{
         console.log("chats",chats)
         socket.emit('loadChats',{chats:chats})
     })
+
+    //delete chats
+    socket.on('chatDeleted',(id)=>{
+        socket.broadcast.emit('chatMessageDeleted',id)
+    })
     
 })

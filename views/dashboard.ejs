@@ -36,13 +36,38 @@
                 <form action="" id="chat-form">
                     <input type="text" id="message" class="one border" placeholder="Enter Message"  required>
                     <input type="submit" value="Send" id="sendBtn" class="btn btn-primary">
-                    <button class="first-btn btn">😀</button>
+                    <button type="button" class="first-btn btn">😀</button>
                 </form>
                 
             </div>
             
         </div>
         
+    </div>
+
+
+    <div class="modal fade" id="deleteChatModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Delete Chat</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <form id="delete-chat-form">
+            <div class="modal-body">
+                <input type="hidden" name="id" id="delete-message-id">
+                <p>Are you sure you want to delete this message? This message will be deleted permanently!</p>
+                <p><b id="delete-message"></b></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
+            </div>
+        </form>
+        </div>
+    </div>
     </div>
 
     <script>
@@ -103,8 +128,10 @@
                         $('#message').val('');
                         let chat = response.data.message;
                         let html = `
-                            <div class="current-user-chat">
-                                <h5>`+chat+`</h5> 
+                            <div class="current-user-chat" id='`+response.data._id+`'>
+                                <h5>`+chat+` 
+                                <i class="fa fa-trash" aria-hidden="true" data-id="`+response.data._id+`" data-toggle="modal" data-target="#deleteChatModal"></i>
+                                </h5>
                             </div>
                         `;
                         $('#chat-container').append(html);
@@ -119,10 +146,11 @@
         })
 
         socket.on('loadNewChat',(data)=>{
+            //not sure if data._id exsists
             if(sender_id == data.receiver_id && receiver_id == data.sender_id) {
                 let chat = data.message;
                 let html = `
-                    <div class="distance-user-chat">
+                    <div class="distance-user-chat" id='`+data._id+`'> 
                         <h5>`+chat+`</h5>
                     </div>
                 `;
@@ -131,30 +159,31 @@
             }
         })
 
-        //load chats 
-        socket.on('loadChats',(data)=>{
-            $('#chat-container').html('');
-            const chats = data.chats
-            //console.log(chats);
+        
+        socket.on('loadChats', (data) => {
+            $('#chat-container').html(''); // Clear previous chats
+            const chats = data.chats;
             let html = '';
-            for(let x=0;x<chats.length;x++) {
-                let addClass = '';
-                if(chats[x]['sender_id']==sender_id){
-                    addClass = 'current-user-chat';
-                }
-                else{
-                    addClass = 'distance-user-chat';
-                }
-                html+=`
-                    <div class='`+addClass+`''>
-                        <h5>`+chats[x]['message']+`</h5>
-                    </div>
-                `;
 
+            for (let x = 0; x < chats.length; x++) {
+                let addClass = (chats[x]['sender_id'] == sender_id) ? 'current-user-chat' : 'distance-user-chat';
+
+                html += `
+                    <div class='${addClass}' id='${chats[x]['_id']}'>
+                        <h5>${chats[x]['message']}`;
+                
+                if (chats[x]['sender_id'] == sender_id) {
+                    html += `<i class="fa fa-trash" aria-hidden="true" data-id="${chats[x]['_id']}" data-toggle="modal" data-target="#deleteChatModal"></i>`;
+                }
+                
+                html += `</h5>
+                    </div>`;
             }
+
             $('#chat-container').append(html);
-            scrollChat();
-        })
+            scrollChat(); // Ensure scrolling happens
+        });
+
 
         function scrollChat() {
             jQuery.noConflict();
@@ -164,14 +193,50 @@
             }, 'fast'); // Use 'fast' or adjust duration for smooth scrolling
         }
 
+        
+        $(document).on('click','.fa-trash',function(){
+            jQuery.noConflict();
+            let msg =  $(this).parent().text();
+            $('#delete-message').text(msg)
+            $('#delete-message-id').val($(this).attr('data-id'))
+        })
 
+        $('#delete-chat-form').submit(function(e){
+            e.preventDefault();
+            jQuery.noConflict();
+            const id = $('#delete-message-id').val();
+            $.ajax({
+                url: '/delete-chat',
+                type: 'post',
+                data: {
+                    id: id
+                },
+                success: (response) => {
+                    if (response.success) {
+                        jQuery.noConflict();
+                        $('#'+id).remove();
+                        jQuery.noConflict();
+                        $('#deleteChatModal').modal('hide');
+                        socket.emit('chatDeleted',id);
+                    }
+                    else {
+                        alert(response.msg)
+                    }
+                }
+            })
+        });
+
+        socket.on('chatMessageDeleted',(id)=>{
+            $('#'+id).remove();
+        })
         
 
     </script>
 
     <script src="/vanillaEmojiPicker.js"></script>
     <script>
-
+        
+        
         new EmojiPicker({
             trigger: [
                 {
@@ -186,6 +251,7 @@
             closeButton: true,
             //specialButtons: green
         });
+
 
     </script>
     
