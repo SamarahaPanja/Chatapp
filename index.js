@@ -150,12 +150,12 @@ usp.on('connection', async (socket)=>{
 
     //load old chats
     socket.on('exsistsChat',async (data)=>{
-        console.log("asked to load chats")
+        //console.log("asked to load chats")
         const chats = await Chat.find({ $or:[
             {sender_id: data.sender_id,receiver_id: data.receiver_id},
             {sender_id: data.receiver_id,receiver_id: data.sender_id},
         ]})
-        console.log("chats",chats)
+        //console.log("chats",chats)
         socket.emit('loadChats',{chats:chats})
     })
 
