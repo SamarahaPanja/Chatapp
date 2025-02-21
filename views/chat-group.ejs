@@ -3,26 +3,34 @@
     <h2 class="mb-4" style="font-family: 'Poppins', sans-serif;
     font-weight: bold;
     color: #fff;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);">Hello <%= user.name %>
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);">Group Chatting
     </h2>
 
     <div class="row">
         <div class="col-md-4">
             <ul class="list-group">
-                <% if(users.length> 0) {
-                    for(let i=0; i<users.length; i++) { %>
+                <% if(myGroups.length> 0) {
+                    for(let i=0; i<myGroups.length; i++) { %>
 
-                        <li class="list-group-item list-group-item-dark cursor-pointer user-list"
-                            data-id='<%= users[i]['_id']%>' >
-                            <img src="<%='http://localhost:9000/'+users[i]['image'] %>" alt="" height="50px"
+                        <li class="list-group-item list-group-item-dark cursor-pointer group-list"
+                            data-id='<%= myGroups[i]['_id']%>' >
+                            <img src="<%='http://localhost:9000/'+myGroups[i]['image'] %>" alt="" height="50px"
                                 width="50px" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                            <%= users[i]['name'] %>
+                            <%= myGroups[i]['name'] %>
 
-                                <% if(users[i]['is_online']==1){ %>
-                                    <sup class="online-status" id="<%= users[i]['_id']%>-status">Online</sup>
-                                    <% } else{ %>
-                                        <sup class="offline-status" id="<%= users[i]['_id']%>-status">Offline</sup>
-                                        <% } %>
+
+                        </li>
+                        <% } } %>
+
+                <% if(joinedGroups.length> 0) {
+                    for(let i=0; i<joinedGroups.length; i++) { %>
+
+                        <li class="list-group-item list-group-item-dark cursor-pointer group-list"
+                            data-id='<%= joinedGroups[i]['group_id']['_id']%>' >
+                            <img src="<%='http://localhost:9000/'+joinedGroups[i]['group_id']['image'] %>" alt="" height="50px"
+                                width="50px" style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
+                            <%= joinedGroups[i]['group_id']['name'] %>
+
 
                         </li>
                         <% } } %>
@@ -31,14 +39,14 @@
 
         <div class="col-md-8">
             
-            <div class="chat-section">
-                <div id="chat-container">
+            <div class="group-chat-section chat-section">
+                <div id="group-chat-container">
                     
                 </div>
 
-                <div class="chat-section chat-section2" >
-                    <form action="" id="chat-form">
-                    <input type="text" id="message" class="one border" placeholder="Enter Message"  required>
+                <div class="group-chat-section chat-section chat-section2" >
+                    <form action="" id="group-chat-form">
+                    <input type="text" id="group-message" class="one border" placeholder="Enter Message"  required>
                     <input type="submit" value="Send" id="sendBtn" class="btn btn-primary">
                     <button type="button" class="first-btn btn" style="font-size: 1.2rem;">😀</button>
                     
@@ -187,23 +195,24 @@
             const gifMsg = `<img src="${text}"class="gif-chat-item"></img>`;
             jQuery.noConflict();
             $.ajax({
-                url: '/save-chat',
+                url: '/group-chat-save',
                 type: 'post',
                 data: {
                     sender_id: sender_id,
-                    receiver_id: receiver_id,
+                    group_id: global_group_id,
                     message: gifMsg
                 },
                 success: (response) => {
                     if (response.success) {
                         //$('#message').val('');
-                        let chat = response.data.message;
+                        //let chat = response.data.message;
+                        let message = response.chat.message;
                         let html = `
-                            <div class="current-user-chat" id='${response.data._id}'>
+                            <div class="current-user-chat" id='${response.chat._id}'>
                                 <h5>
-                                    <span>${chat}</span> 
+                                    <span>${message}</span> 
                                     <i class="fa fa-trash" aria-hidden="true" 
-                                    data-id="${response.data._id}" 
+                                    data-id="${response.chat._id}" 
                                     data-toggle="modal" 
                                     data-target="#deleteChatModal">
                                     </i>
@@ -212,8 +221,9 @@
                         `;
 
                         
-                        $('#chat-container').append(html);
-                        socket.emit('newChat', response.data);
+                        $('#group-chat-container').append(html);
+                        socket.emit('newGroupChat', response.chat);
+                        console.log(response.chat)
                         scrollChat();
                     }
                     else {
@@ -227,4 +237,4 @@
 
 
 
-    <%-include('layouts/footer.ejs') %>
+    <%-include('layouts/footer.ejs') %> 

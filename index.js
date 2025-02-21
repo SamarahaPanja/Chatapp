@@ -26,63 +26,63 @@ mongoose.connect('mongodb://localhost:27017/dynamic-chatapp')
 
 
 
-const rooms = {}
+// const rooms = {}
 
-io.on('connection', (socket) => {
-    console.log('a user connected', socket.id)
-    socket.on('file-meta',(data)=>{
-        console.log('file-meta',data)
-        socket.join(data.room)
-        socket.in(data.room).emit('fs-meta',data.metadata)
-    })
-    socket.on('fs-start',(data)=>{
-        console.log('fs-start',data)
-        socket.in(data.room).emit('fs-share-sender',{})
-    })
-    socket.on('file-raw',(data)=>{
-        socket.in(data.room).emit('fs-share',data.buffer)
-    })
-    socket.on('new-user', (room, name) => {
-        socket.join(room)
-        rooms[room].users[socket.id] = name
-        socket.to(room).emit('user-connected', name)
-    })
-    socket.on('disconnect', () => {
-        //console.log('user disconnected',socket.id)
-        getUserRooms(socket).forEach(room => {
-            socket.to(room).emit('user-disconnected', rooms[room].users[socket.id])
-            delete rooms[room].users[socket.id]
-        })
-    })
-    socket.on('sendMessage', (room, message) => {
-        //console.log(message);
+// io.on('connection', (socket) => {
+//     console.log('a user connected', socket.id)
+//     socket.on('file-meta',(data)=>{
+//         console.log('file-meta',data)
+//         socket.join(data.room)
+//         socket.in(data.room).emit('fs-meta',data.metadata)
+//     })
+//     socket.on('fs-start',(data)=>{
+//         console.log('fs-start',data)
+//         socket.in(data.room).emit('fs-share-sender',{})
+//     })
+//     socket.on('file-raw',(data)=>{
+//         socket.in(data.room).emit('fs-share',data.buffer)
+//     })
+//     socket.on('new-user', (room, name) => {
+//         socket.join(room)
+//         rooms[room].users[socket.id] = name
+//         socket.to(room).emit('user-connected', name)
+//     })
+//     socket.on('disconnect', () => {
+//         //console.log('user disconnected',socket.id)
+//         getUserRooms(socket).forEach(room => {
+//             socket.to(room).emit('user-disconnected', rooms[room].users[socket.id])
+//             delete rooms[room].users[socket.id]
+//         })
+//     })
+//     socket.on('sendMessage', (room, message) => {
+//         //console.log(message);
 
-        //io.emit('message', {message:message,name:users[socket.id]})
-        //socket.to(room).emit('message', { message: message, name: rooms[room].users[socket.id] }) 
-        if (rooms[room]) {
-            // Get the user's name from the rooms object
-            const userName = rooms[room].users[socket.id];
+//         //io.emit('message', {message:message,name:users[socket.id]})
+//         //socket.to(room).emit('message', { message: message, name: rooms[room].users[socket.id] }) 
+//         if (rooms[room]) {
+//             // Get the user's name from the rooms object
+//             const userName = rooms[room].users[socket.id];
 
-            if (userName) {
-                // Send the message to the room
-                socket.join(room)
-                io.to(room).emit('message', { message: message, name: userName });
-            } else {
-                console.log('User not found in room:', socket.id);
-            }
-        } else {
-            console.log('Room does not exist:', room);
-        }
-    })
+//             if (userName) {
+//                 // Send the message to the room
+//                 socket.join(room)
+//                 io.to(room).emit('message', { message: message, name: userName });
+//             } else {
+//                 console.log('User not found in room:', socket.id);
+//             }
+//         } else {
+//             console.log('Room does not exist:', room);
+//         }
+//     })
 
-})
+// })
 
-function getUserRooms(socket) {
-    return Object.entries(rooms).reduce((names, [name, room]) => {
-        if (room.users[socket.id] != null) names.push(name)
-        return names;
-    }, []);
-}
+// function getUserRooms(socket) {
+//     return Object.entries(rooms).reduce((names, [name, room]) => {
+//         if (room.users[socket.id] != null) names.push(name)
+//         return names;
+//     }, []);
+// }
 server.listen(9000, () => console.log('Server started at port 9000'))
 
 //app.use(express.static(path.resolve("./public")));
@@ -97,16 +97,16 @@ app.use('/', userRoute)
 //     return res.render('index', { rooms: rooms })
 // })
 
-app.post('/room', (req, res) => {
-    if (rooms[req.params.room] != null) {  //case when room already exsists
-        return res.redirect('/')
-    }
-    rooms[req.body.room] = { users: {} };
-    //send message that new room was created
-    io.emit('room-created', req.body.room)
-    res.redirect(req.body.room)
+// app.post('/room', (req, res) => {
+//     if (rooms[req.params.room] != null) {  //case when room already exsists
+//         return res.redirect('/')
+//     }
+//     rooms[req.body.room] = { users: {} };
+//     //send message that new room was created
+//     io.emit('room-created', req.body.room)
+//     res.redirect(req.body.room)
     
-})
+// })
 
 // app.get('/:room', (req, res) => {
 //     if (rooms[req.params.room] == null) {
@@ -115,9 +115,9 @@ app.post('/room', (req, res) => {
 //     res.render('room', { roomName: req.params.room })
 // })
 
-app.get('/video/:room', (req, res) => {
-    res.render('video',{roomId: req.params.room});
-});
+// app.get('/video/:room', (req, res) => {
+//     res.render('video',{roomId: req.params.room});
+// });
 
 
 const User = require('./models/userModel')
@@ -162,6 +162,17 @@ usp.on('connection', async (socket)=>{
     //delete chats
     socket.on('chatDeleted',(id)=>{
         socket.broadcast.emit('chatMessageDeleted',id)
+    })
+
+    //delete chats
+    socket.on('chatUpdated',(data)=>{
+        socket.broadcast.emit('chatMessageUpdated',data)
+    })
+
+    //new group chat
+    socket.on('newGroupChat',function(data){
+        console.log("load new group chat");
+        socket.broadcast.emit('loadNewGroupChat',data)
     })
     
 })

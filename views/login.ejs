@@ -1,26 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-</head>
-<body>
-    <h1>Login</h1>
-    <% 
-        if(typeof message !== 'undefined'){
-            %>
-                <h4 style="color: red;"><%= message%></h4>
-            <%
+    <style>
+         /* Global Styles */
+         body {
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1A2980, #26D0CE);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            flex-direction: column;
         }
-    %>
-    
-    <form action="/" method="post">
-        <input type="email" placeholder="Enter Email" name="email" required>
-        <br><br>
-        <input type="password" placeholder="Enter Password" name="password" required>
-        <br><br>
-        <input type="submit" value="Login">
-    </form>
+
+        /* Container */
+        .login-container {
+            background: linear-gradient(135deg, #2C3E50, #34495E);
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        /* Headings */
+        h1 {
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+            color: #f1f1f1;
+        }
+
+        .error-message {
+            color: #FF6B6B;
+            margin-bottom: 1rem;
+        }
+
+        /* Form */
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Inputs */
+        input[type="email"],
+        input[type="password"] {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 1rem;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="email"]::placeholder,
+        input[type="password"]::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        input[type="email"]:focus,
+        input[type="password"]:focus {
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Submit Button */
+        input[type="submit"] {
+            background: linear-gradient(135deg, #FF512F, #DD2476);
+            border: none;
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        input[type="submit"]:hover {
+            background: linear-gradient(135deg, #DD2476, #FF512F);
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(255, 81, 47, 0.5);
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Login</h1><br>
+    <% if(typeof message !=='undefined' ){ %>
+        <h4 style="color: red;">
+            <%= message%>
+        </h4>
+        <% } %>
+
+            <form action="/" method="post">
+                <input type="email" placeholder="Enter Email" name="email" required>
+                <br><br>
+                <input type="password" placeholder="Enter Password" name="password" required>
+                <br><br>
+                <input type="submit" value="Login">
+            </form>
 </body>
+
 </html>

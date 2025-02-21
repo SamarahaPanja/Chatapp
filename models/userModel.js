@@ -12,7 +12,7 @@ const userSchema = new mongoose.Schema({
     },
     image:{
         type: String,
-
+        default: "/images/defaultPFP.webp"
     },
     password: {
         type: String,
