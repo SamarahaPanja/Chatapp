@@ -84,7 +84,9 @@ mongoose.connect(process.env.MONGODB)
 //         return names;
 //     }, []);
 // }
-server.listen(9000, () => console.log('Server started at port 9000'))
+
+const port = process.env.PORT||9001
+server.listen(port, () => console.log('Server started at port 9000'))
 
 //app.use(express.static(path.resolve("./public")));
 
