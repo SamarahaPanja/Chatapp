@@ -18,18 +18,25 @@ const register = async (req,res)=>{
     try {
         console.log(req)
         const passwordHash = await bcrypt.hash(req.body.password,10);
-
+        const img = req.file && req.file.filename ? 'images/' + req.file.filename : 'images/defaultPFP.png';
         const user = new User({
             name: req.body.name,
             email: req.body.email,
-            image: 'images/'+req.file.filename,
+            image: img,
             password: passwordHash
         })
 
+        const preExsist = await User.find({email:req.body.email});
+        console.log("---------------------------------------------------------------------------------------------------")
+        console.log(preExsist)
+        if(preExsist.length > 0){
+            return res.render('register',{message: 'Email already registered!'})
+        }
+        
+
         await user.save();
 
-
-        res.render('register',{message: 'Registration Successful'})
+        res.redirect('/')
     } catch (error) {
         console.log(error.message);
     }

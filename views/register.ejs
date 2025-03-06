@@ -128,11 +128,11 @@
 </head>
 
 <body>
-    <h1>Register</h1>
+    <h1>Sign Up</h1>
     <form action="/register" method="POST" enctype="multipart/form-data">
-        <input type="text" name="name" placeholder="Enter Name" required>
+        <input type="text" name="name" placeholder="Enter Name*" required>
         <br><br>
-        <input type="email" name="email" placeholder="Enter Email" required>
+        <input type="email" name="email" placeholder="Enter Email*" required>
         <br><br>
         <label class="file-upload">
             <span class="file-upload-label">Upload Profile Picture</span>
@@ -142,10 +142,12 @@
 
         <!-- <input type="file" name="image" required> -->
         <br><br>
-        <input type="password" name="password" placeholder="Enter Password" required>
+        <input type="password" name="password" placeholder="Enter Password*" required>
         <br><br>
-        <input type="submit" value="Register">
+        <input type="submit" value="Sign Up">
+        
     </form>
+    <h3><a href="/">Already Registered? Login Here</a></h3>
     <% if (typeof message !="undefined" ) { %>
         <p style="color: green;">
             <%= message %>

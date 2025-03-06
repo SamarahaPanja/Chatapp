@@ -8591,6 +8591,7 @@ h1, h2, h3 {
   box-shadow: 0px 0px 8px rgba(0, 168, 232, 0.5);
 }
 
+
 /* Buttons inside chat form */
 #sendBtn, .first-btn {
   padding: 10px 14px;
@@ -8714,3 +8715,6 @@ input[type="file"] {
   background: #00A8E8;
 }
 
+.group-chat-section,.chat-section{
+  display: none;
+}
