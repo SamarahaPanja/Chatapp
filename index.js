@@ -20,9 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 require('dotenv').config()
 const mongoose = require('mongoose')
 
-mongoose.connect('mongodb://localhost:27017/dynamic-chatapp')
+//mongoose.connect('mongodb://localhost:27017/dynamic-chatapp')
 //mongodb://localhost:27017/dynamic-chatapp
-//mongoose.connect(process.env.MONGODB)
+mongoose.connect(process.env.MONGODB)
 
 
 
