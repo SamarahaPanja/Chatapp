@@ -360,12 +360,33 @@ const saveGroupChats = async (req,res)=>{
 
 const loadGroupChats = async (req,res)=>{
     try {
-        const groupChats = await GroupChat.find({group_id: req.body.group_id})
+        const groupChats = await GroupChat.find({group_id: req.body.group_id});
         res.status(200).send({success: true,msg:'Chat loaded successfully',chats: groupChats});
     } catch (error) {
         res.status(400).send({success: false,msg:error.message});
     } 
 }
+
+const deleteGroupChat = async (req,res)=>{
+    try {
+        await GroupChat.deleteOne({_id: req.body.id})
+        res.status(200).send({success: true,msg:'Chat deleted successfully'});
+    } catch (error) {
+        res.status(400).send({success: false,msg:error.message});
+    }
+}
+
+const updateGroupChat = async (req,res)=>{
+    try {
+        await GroupChat.findByIdAndUpdate({_id: req.body.id},{
+            $set: {message:req.body.message}
+        })
+        res.status(200).send({success: true,msg:'Chat updated successfully'});
+    } catch (error) {
+        res.status(400).send({success: false,msg:error.message});
+    }
+}
+
 
 module.exports = {
     registerLoad, 
@@ -389,4 +410,6 @@ module.exports = {
     groupChats,
     saveGroupChats,
     loadGroupChats,
+    deleteGroupChat,
+    updateGroupChat,
 }

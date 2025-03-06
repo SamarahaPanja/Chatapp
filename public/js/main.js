@@ -446,8 +446,8 @@ $('#group-chat-form').submit((e) => {
 				let html = `
 					<div class="current-user-chat" id='`+response.chat._id+`'>
 						<h5><span>`+message+`</span> 
-						<i class="fa fa-trash" aria-hidden="true" data-id="`+response.chat._id+`" data-toggle="modal" data-target="#deleteChatModal"></i>
-						<i class="fa fa-edit" aria-hidden="true" data-id="`+response.chat._id+`" data-toggle="modal" data-msg='`+message+`' data-target="#updateChatModal"></i>
+						<i class="fa fa-trash deleteGroupChat" aria-hidden="true" data-id="`+response.chat._id+`" data-toggle="modal" data-target="#deleteGroupChatModal"></i>
+						<i class="fa fa-edit updateGroupChat" aria-hidden="true" data-id="`+response.chat._id+`" data-toggle="modal" data-msg='`+message+`' data-target="#updateGroupChatModal"></i>
 						</h5>
 					</div>
 				`;
@@ -500,9 +500,11 @@ function loadGroupChats(){
 					<div class="${className}" id='`+chats[i]['_id']+`'>
 							<h5><span>`+chats[i]['message']+`</span> 
 					`;
-					if(className == 'current-user-chat') html+=`
-					<i class="fa fa-trash" aria-hidden="true" data-id="`+chats[i]['_id']+`" data-toggle="modal" data-target="#deleteChatModal"></i>
-							<i class="fa fa-edit" aria-hidden="true" data-id="`+chats[i]['_id']+`" data-toggle="modal" data-msg='`+chats[i]['message']+`' data-target="#updateChatModal"></i>`;
+					if(className == 'current-user-chat'){ 
+					html+=`<i class="fa fa-trash deleteGroupChat" aria-hidden="true" data-id="`+chats[i]['_id']+`" data-toggle="modal" data-target="#deleteGroupChatModal"></i>`
+
+					if(!chats[i]['message'].trim().toLowerCase().startsWith("<img")) html+=`<i class="fa fa-edit updateGroupChat" aria-hidden="true" data-id="`+chats[i]['_id']+`" data-toggle="modal" data-msg='`+chats[i]['message']+`' data-target="#updateGroupChatModal"></i>`;
+					}
 					html+=`</h5>
 						</div>
 					`;
@@ -518,3 +520,84 @@ function loadGroupChats(){
 
 	})
 }
+
+$(document).on('click','.deleteGroupChat',function(e){
+	e.preventDefault();
+    var msg = $(this).parent().find('span').text();
+	console.log(msg);
+
+	$('#delete-group-message').text(msg);
+	$('#delete-group-message-id').val($(this).attr('data-id'));
+})
+
+$('#delete-group-chat-form').submit(function(e){
+	e.preventDefault();
+	const id = $('#delete-group-message-id').val();
+	$.ajax({
+		url: "/delete-group-chat",
+		type: "POST",
+        data: {id: id},
+        success: function(res){
+			if(res.success){
+				$('#'+id).remove();
+				
+				jQuery('#deleteGroupChatModal').modal('hide');
+				
+				socket.emit('groupChatDeleted',id);
+			}
+			else{
+				alert(res.msg);
+			}
+		}
+	})
+})
+
+//listen for chat deleted using socket
+socket.on('groupChatMessageDeleted',function(id){
+
+	$('#'+id).remove();
+})
+
+
+
+
+$(document).on('click','.updateGroupChat',function(e){
+	e.preventDefault();
+    // var msg = $(this).parent().find('span').text();
+	// console.log(msg);
+
+	// $('#delete-group-message').text(msg);
+	// $('#delete-group-message-id').val($(this).attr('data-id'));
+	$('#update-group-message-id').val($(this).attr('data-id'))
+	$('#update-group-message').val($(this).attr('data-msg'))
+})
+
+$('#update-group-chat-form').submit(function(e){
+	e.preventDefault();
+	const id  = $('#update-group-message-id').val()
+	const msg = $('#update-group-message').val()
+	$.ajax({
+		url: "/update-group-chat",
+		type: "POST", 
+        data: {id: id,message:msg},
+        success: function(res){
+			if(res.success){
+				jQuery('#updateGroupChatModal').modal('hide');
+				$('#'+id).find('span').text(msg);
+				$('#'+id).find('.updateGroupChat').attr('data-msg',msg);
+				
+				
+				socket.emit('groupChatUpdated',{id: id,message:msg});
+			}
+			else{
+				alert(res.msg);
+			}
+		}
+	})
+})
+
+//listen for chat deleted using socket
+socket.on('groupChatMessageUpdated',function(data){
+
+	$('#'+data.id).find('span').text(data.message);
+})

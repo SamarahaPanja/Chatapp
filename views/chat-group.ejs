@@ -84,7 +84,7 @@
     </div>
 
 
-    <div class="modal fade" id="deleteChatModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="deleteGroupChatModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
         <div class="modal-header">
@@ -93,11 +93,11 @@
             <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <form id="delete-chat-form">
+        <form id="delete-group-chat-form">
             <div class="modal-body">
-                <input type="hidden" name="id" id="delete-message-id">
+                <input type="hidden" name="id" id="delete-group-message-id">
                 <p>Are you sure you want to delete this message? This message will be deleted permanently!</p>
-                <p><b id="delete-message"></b></p>
+                <p><b id="delete-group-message"></b></p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -108,7 +108,7 @@
     </div>
     </div>
 
-    <div class="modal fade" id="updateChatModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal fade" id="updateGroupChatModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
         <div class="modal-header">
@@ -117,10 +117,10 @@
             <span aria-hidden="true">&times;</span>
             </button>
         </div>
-        <form id="update-chat-form">
+        <form id="update-group-chat-form">
             <div class="modal-body">
-                <input type="hidden" name="id" id="update-message-id">
-                <input type="text" name="message" id="update-message" required placeholder="Enter Message" class="two">
+                <input type="hidden" name="id" id="update-group-message-id">
+                <input type="text" name="message" id="update-group-message" required placeholder="Enter Message" class="two">
                 <button type="button" class="second-btn btn">😀</button>
             </div>
             <div class="modal-footer">
@@ -211,10 +211,10 @@
                             <div class="current-user-chat" id='${response.chat._id}'>
                                 <h5>
                                     <span>${message}</span> 
-                                    <i class="fa fa-trash" aria-hidden="true" 
+                                    <i class="fa fa-trash deleteGroupChat" aria-hidden="true" 
                                     data-id="${response.chat._id}" 
                                     data-toggle="modal" 
-                                    data-target="#deleteChatModal">
+                                    data-target="#deleteGroupChatModal">
                                     </i>
                                 </h5>
                             </div>

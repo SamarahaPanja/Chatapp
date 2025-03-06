@@ -20,8 +20,9 @@ app.use(express.urlencoded({ extended: true }));
 require('dotenv').config()
 const mongoose = require('mongoose')
 
-mongoose.connect('mongodb://localhost:27017/dynamic-chatapp')
+//mongoose.connect('mongodb://localhost:27017/dynamic-chatapp')
 //mongodb://localhost:27017/dynamic-chatapp
+mongoose.connect(process.env.MONGODB)
 
 
 
@@ -174,5 +175,12 @@ usp.on('connection', async (socket)=>{
         console.log("load new group chat");
         socket.broadcast.emit('loadNewGroupChat',data)
     })
+
+    socket.on('groupChatDeleted',function(id){
+        socket.broadcast.emit('groupChatMessageDeleted',id)
+    })
     
+    socket.on('groupChatUpdated',function(data){
+        socket.broadcast.emit('groupChatMessageUpdated',data)
+    })
 })
